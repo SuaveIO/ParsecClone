@@ -277,7 +277,7 @@ let lookaheadAndSeek () =
 
   let bp = new BinParser<_>(id)
 
-  let testFile = "test.bin"
+  let testFile = Path.GetRandomFileName()
 
   let fs = File.OpenRead(writeTestFile testFile)
 
@@ -317,7 +317,7 @@ let lookaheadAndSeekRaw () =
 
   let bp = new BinParser<_>(id)
 
-  let testFile = "test.bin"
+  let testFile = Path.GetRandomFileName()
 
   let fs = File.OpenRead(writeTestFile testFile)
 
