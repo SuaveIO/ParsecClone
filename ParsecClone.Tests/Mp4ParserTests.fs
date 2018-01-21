@@ -4,7 +4,7 @@ open System.IO
 open Expecto
 open Expecto.Flip
 open Mp4Matcher
-open ParsecClone.CombinatorBase
+open ParsecClone
 
 let audioStts result =
   let getAudioMetadata src = maybe {

@@ -3,8 +3,8 @@ module ParsecClone.Tests.ManyUnitTests
 open Expecto
 open Expecto.Flip
 open System.IO
+open ParsecClone
 open ParsecClone.BinaryCombinator
-open ParsecClone.CombinatorBase
 
 let (bp: BinParser<unit>) = new BinParser<_> (id)
 

@@ -1,29 +1,29 @@
 ﻿namespace Mp4Matcher
 
+open ParsecClone
 open ParsecClone.BinaryCombinator
-open ParsecClone.CombinatorBase
 open System
 
 [<AutoOpen>]
-module Mp4Leaves = 
-   
-    let udta : VideoParser<_> = 
+module Mp4Leaves =
+
+    let udta : VideoParser<_> =
         atom "udta"         >>= fun id ->
         skipRemaining id.Size 8  >>= fun _ ->
         preturn id  |>> UDTA
 
-    let edts : VideoParser<_> = 
+    let edts : VideoParser<_> =
         atom "edts"         >>= fun id ->
         skipRemaining id.Size 8  >>= fun _ ->
         freeOpt >>. preturn id |>> EDTS
-        
-    let uuid : VideoParser<_> = 
+
+    let uuid : VideoParser<_> =
         atom "uuid"         >>= fun id ->
         skipRemaining id.Size 8  >>= fun _ ->
-        freeOpt >>. preturn id                                      
-                           
-    let ftyp : VideoParser<_> = 
-        atom "ftyp" >>= fun id -> 
+        freeOpt >>. preturn id
+
+    let ftyp : VideoParser<_> =
+        atom "ftyp" >>= fun id ->
         stringId         >>= fun majorBrand ->
         bp.uint32        >>= fun minorVersion ->
             let brands = ((int)id.Size - 16) / 4
@@ -34,8 +34,8 @@ module Mp4Leaves =
                     Brands = foundBrands
                 } |>> FTYP
 
-    let mvhd : VideoParser<_> = 
-        atom "mvhd"            >>= fun id -> 
+    let mvhd : VideoParser<_> =
+        atom "mvhd"            >>= fun id ->
         versionAndFlags             >>= fun vFlags ->
         date                        >>= fun creationTime ->
         date                        >>= fun modificationTime ->
@@ -44,13 +44,13 @@ module Mp4Leaves =
         bp.uint32                   >>= fun rate ->
         bp.uint16                   >>= fun volume ->
         bp.skip 10                  >>= fun reserved ->
-        matrix                      >>= fun matrix -> 
+        matrix                      >>= fun matrix ->
         bp.uint32                   >>= fun previewTime ->
         bp.uint32                   >>= fun previewDuration ->
         bp.uint32                   >>= fun posterTime ->
         bp.uint32                   >>= fun selectionTime ->
         bp.uint32                   >>= fun selectionDuration ->
-        bp.uint32                   >>= fun currentTime ->        
+        bp.uint32                   >>= fun currentTime ->
         bp.uint32                   >>= fun nextTrackId ->
         freeOpt >>. preturn {
             Atom = id
@@ -69,20 +69,20 @@ module Mp4Leaves =
         } |>> MVHD
 
 
-    let iods : VideoParser<_> = 
+    let iods : VideoParser<_> =
         atom "iods" >>= fun id ->
         skipRemaining id.Size 8 >>= fun _ ->
         freeOpt >>. preturn id |>> IODS
 
-    let tkhd : VideoParser<_> = 
+    let tkhd : VideoParser<_> =
         atom "tkhd"     >>= fun id ->
         versionAndFlags >>= fun vFlags ->
         date        >>= fun creationTime ->
         date        >>= fun modificationTime ->
         bp.uint32   >>= fun trackId ->
         bp.uint32   >>= fun reserved ->
-        bp.uint32   >>= fun duration ->    
-        bp.skip 8   >>= fun reserved2 ->    
+        bp.uint32   >>= fun duration ->
+        bp.skip 8   >>= fun reserved2 ->
         bp.uint16   >>= fun layer ->
         bp.uint16   >>= fun alteranteGroup ->
         bp.uint16   >>= fun volume ->
@@ -103,47 +103,47 @@ module Mp4Leaves =
             Height = width
             Width = height
         } |>> TKHD
-    
-    let vmhd : VideoParser<_> = 
+
+    let vmhd : VideoParser<_> =
         atom "vmhd"    >>= fun id ->
         versionAndFlags     >>= fun vFlags ->
         bp.uint16           >>= fun graphicsMode ->
         bp.uint16           >>= fun opcodeRed ->
         bp.uint16           >>= fun opcodeGreen ->
         bp.uint16           >>= fun opcodeBlue ->
-        freeOpt >>. 
+        freeOpt >>.
             (getUserState >>= fun state ->
-            setUserState { state with IsAudio = false }) >>. 
+            setUserState { state with IsAudio = false }) >>.
                 preturn id |>> VMHD
 
-    let smhd : VideoParser<_> = 
+    let smhd : VideoParser<_> =
         atom "smhd"    >>= fun id ->
         versionAndFlags     >>= fun vFlags ->
         bp.uint16           >>= fun balance ->
-        bp.skip 2           >>= fun _ ->        
-        freeOpt >>. 
+        bp.skip 2           >>= fun _ ->
+        freeOpt >>.
             (getUserState >>= fun state ->
-            setUserState { state with IsAudio = true })   >>. 
+            setUserState { state with IsAudio = true })   >>.
                 preturn id |>> SMHD
 
-    let drefEntry : VideoParser<_> = 
+    let drefEntry : VideoParser<_> =
         bp.uint32           >>= fun size ->
         bp.byte4 |>> System.Text.Encoding.ASCII.GetString >>= fun ``type`` ->
         versionAndFlags     >>= fun vFlags ->
         freeOpt >>. preturn ()
 
-    let dref : VideoParser<_> = 
+    let dref : VideoParser<_> =
         atom "dref"    >>= fun id ->
         versionAndFlags     >>= fun vFlags ->
         bp.uint32           >>= fun numEntries ->
         manyN ((int)numEntries) drefEntry >>= fun entries ->
         freeOpt >>. preturn id |>> DREF
 
-    let dinf : VideoParser<_> = 
+    let dinf : VideoParser<_> =
         atom "dinf"    >>= fun id ->
         freeOpt >>. dref |>> DINF
 
-    let mdhd : VideoParser<_> = 
+    let mdhd : VideoParser<_> =
         atom "mdhd"    >>= fun id ->
         versionAndFlags     >>= fun vFlags ->
         date                >>= fun creationTime ->
@@ -154,7 +154,7 @@ module Mp4Leaves =
         bp.uint16           >>= fun quality ->
         freeOpt >>. preturn id |>> MDHD
 
-    let hdlr : VideoParser<_> = 
+    let hdlr : VideoParser<_> =
         atom "hdlr"    >>= fun id ->
         versionAndFlags     >>= fun vFlags ->
         bp.uint32           >>= fun componentType ->

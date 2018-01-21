@@ -1,43 +1,43 @@
 ﻿namespace Mp4Matcher
 
+open ParsecClone
 open ParsecClone.BinaryCombinator
-open ParsecClone.CombinatorBase
 open System
 
 [<AutoOpen>]
-module Mp4StsdElements = 
-        
-    let esds : VideoParser<_> = 
+module Mp4StsdElements =
+
+    let esds : VideoParser<_> =
         atom "esds"         >>= fun id ->
         skipRemaining id.Size 8  >>= fun _ ->
-        freeOpt >>. preturn id 
+        freeOpt >>. preturn id
 
-    let avcC : VideoParser<_> = 
+    let avcC : VideoParser<_> =
         atom "avcC"        >>= fun id ->
         skipRemaining id.Size 8 >>= fun _ ->
-        freeOpt >>. preturn id 
+        freeOpt >>. preturn id
 
-    let btrt : VideoParser<_> = 
-        atom "btrt"        >>= fun id ->    
+    let btrt : VideoParser<_> =
+        atom "btrt"        >>= fun id ->
         skipRemaining id.Size 8 >>= fun _ ->
-        freeOpt >>. preturn id 
+        freeOpt >>. preturn id
 
-    let uuid : VideoParser<_> = 
-        atom "uuid"        >>= fun id ->    
+    let uuid : VideoParser<_> =
+        atom "uuid"        >>= fun id ->
         skipRemaining id.Size 8 >>= fun _ ->
-        freeOpt >>. preturn id 
+        freeOpt >>. preturn id
 
-    let colr : VideoParser<_> = 
-        atom "colr"        >>= fun id ->    
+    let colr : VideoParser<_> =
+        atom "colr"        >>= fun id ->
         skipRemaining id.Size 8 >>= fun _ ->
-        freeOpt >>. preturn id 
+        freeOpt >>. preturn id
 
-    let pasp : VideoParser<_> = 
-        atom "pasp"        >>= fun id ->    
+    let pasp : VideoParser<_> =
+        atom "pasp"        >>= fun id ->
         skipRemaining id.Size 8 >>= fun _ ->
-        freeOpt >>. preturn id 
+        freeOpt >>. preturn id
 
-    let soundDescription : VideoParser<_> = 
+    let soundDescription : VideoParser<_> =
         bp.uint32   >>= fun size ->
         stringId    >>= fun dataFormat ->
         bp.skip 6   >>= fun _ ->
@@ -51,8 +51,8 @@ module Mp4StsdElements =
         bp.uint16   >>= fun packetSize ->
         bp.uint32   >>= fun sampleRate ->
         freeOpt >>. preturn ()
-    
-    let videoDescription : VideoParser<_> = 
+
+    let videoDescription : VideoParser<_> =
         bp.uint32   >>= fun size ->
         stringId    >>= fun dataFormat ->
         bp.skip 6   >>= fun _ ->
@@ -71,27 +71,26 @@ module Mp4StsdElements =
         stringId    >>= fun compressorName ->
         bp.uint16   >>= fun colorDepth ->
         bp.uint16   >>= fun colorTableId ->
-        bp.skip 28  >>= fun _ ->        
+        bp.skip 28  >>= fun _ ->
         let x = dataFormat
         freeOpt >>. preturn ()
 
-    let videoStsd : VideoParser<_> = 
+    let videoStsd : VideoParser<_> =
         getUserState >>= fun state ->
-        if state.IsAudio then 
-            pzero 
-        else        
+        if state.IsAudio then
+            pzero
+        else
             videoDescription      >>= fun vDesc ->
             many1 <| choice [avcC; btrt; pasp; colr; uuid; esds] >>= fun inner ->
             freeOpt >>. preturn () |>> STSD_VIDEO
 
-    let audioStsd : VideoParser<_> = 
+    let audioStsd : VideoParser<_> =
         getUserState >>= fun state ->
-        if state.IsAudio then 
+        if state.IsAudio then
             soundDescription >>= fun sDesc ->
             esds >>= fun esds ->
             freeOpt >>. preturn () |>> STSD_AUDIO
-        else 
+        else
             pzero
 
     let sampleDescription : VideoParser<_> = audioStsd <|> videoStsd
-    

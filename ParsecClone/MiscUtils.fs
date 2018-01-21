@@ -1,4 +1,4 @@
-﻿namespace ParsecClone.CombinatorBase
+﻿namespace ParsecClone
 
 open System.Diagnostics
 

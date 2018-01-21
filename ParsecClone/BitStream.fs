@@ -1,6 +1,6 @@
 ﻿namespace ParsecClone.BinaryCombinator
 
-open ParsecClone.CombinatorBase
+open ParsecClone
 
 type BitStream<'UserState> (state:byte[], bitOffset:int, userState:'UserState) =
     let mutable userState = userState

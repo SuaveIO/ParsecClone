@@ -1,7 +1,7 @@
 ﻿namespace StringMatchers
 
+open ParsecClone
 open ParsecClone.StringCombinator
-open ParsecClone.CombinatorBase
 
 module FooSample =
     type FooParser<'Return> = Parser<'Return, string, string, unit>

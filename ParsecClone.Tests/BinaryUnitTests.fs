@@ -5,7 +5,7 @@ open Expecto
 open Expecto.Flip
 open System.IO
 open ParsecClone.BinaryCombinator
-open ParsecClone.CombinatorBase
+open ParsecClone
 
 let bp = new BinParser<_>(Array.rev)
 

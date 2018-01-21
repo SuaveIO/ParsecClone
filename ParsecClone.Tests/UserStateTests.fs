@@ -2,7 +2,7 @@
 
 open Expecto
 open Expecto.Flip
-open ParsecClone.CombinatorBase
+open ParsecClone
 open ParsecClone.StringCombinator
 
 type userState = { Name: string }

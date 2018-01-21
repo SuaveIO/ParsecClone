@@ -2,8 +2,8 @@
 
 open Expecto
 open Expecto.Flip
+open ParsecClone
 open ParsecClone.StringCombinator
-open ParsecClone.CombinatorBase
 open StringMatchers.FooSample
 
 let shortCircuitOr () =

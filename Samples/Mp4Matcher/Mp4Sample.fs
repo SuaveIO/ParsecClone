@@ -1,21 +1,21 @@
 ﻿namespace Mp4Matcher
 
+open ParsecClone
 open ParsecClone.BinaryCombinator
-open ParsecClone.CombinatorBase
 open System.Text
 open System
 
 [<AutoOpen>]
-module Mp4P = 
-    
-    let stblInsides = 
+module Mp4P =
+
+    let stblInsides =
                     choice[
-                        (stts >>-- injector "stts"); 
-                        (stsd >>-- injector "stsd"); 
-                        (stsz >>-- injector "stsz"); 
-                        (stsc >>-- injector "stsc"); 
-                        (stco >>-- injector "stco"); 
-                        (stss >>-- injector "stss"); 
+                        (stts >>-- injector "stts");
+                        (stsd >>-- injector "stsd");
+                        (stsz >>-- injector "stsz");
+                        (stsc >>-- injector "stsc");
+                        (stco >>-- injector "stco");
+                        (stss >>-- injector "stss");
                         (ctts >>-- injector "ctts");
                         ((unknown |>> StblTypes.UNKNOWN) >>-- injector "unknown" )
                     ]
@@ -24,10 +24,10 @@ module Mp4P =
 
     let vOrSmhd = vmhd <|> smhd
 
-    let minf = 
+    let minf =
         freeOpt >>.
-        fullConsume "minf" 
-            (fun id -> 
+        fullConsume "minf"
+            (fun id ->
                 choice[
                         vOrSmhd;
                         dinf;
@@ -35,22 +35,22 @@ module Mp4P =
                         (unknown |>> MinfTypes.UNKNOWN)
                     ]) >>-- injector "minf" |>> MINF
 
-    let mdia = 
+    let mdia =
         freeOpt >>.
         fullConsume "mdia"
-            (fun id ->        
+            (fun id ->
                 choice[
-                    mdhd; 
-                    hdlr; 
-                    minf; 
+                    mdhd;
+                    hdlr;
+                    minf;
                     (unknown |>> MdiaTypes.UNKNOWN)
                 ]
             ) >>-- injector "mdia" |>> MDIA
 
-    let trak = 
+    let trak =
         freeOpt >>.
-        fullConsume "trak" 
-            (fun id ->        
+        fullConsume "trak"
+            (fun id ->
                 choice[
                     tkhd;
                     mdia;
@@ -59,16 +59,16 @@ module Mp4P =
                 ]
             ) >>-- injector "trak" |>> TRAK
 
-    let mdat = 
+    let mdat =
         atom "mdat" >>= fun id ->
-        if (int)id.Size = 0 then 
+        if (int)id.Size = 0 then
             bp.skipToEnd  >>. preturn id |>> MDAT
         else
             bp.skip ((int)id.Size-8) >>= fun _ ->
             preturn id |>> MDAT
 
-    let moov =         
-        fullConsume "moov" 
+    let moov =
+        fullConsume "moov"
             (fun id ->
                 choice[
                     mvhd;
@@ -76,10 +76,9 @@ module Mp4P =
                     trak;
                     (unknown |>> MoovTypes.UNKNOWN)
                 ]
-            ) >>-- injector "moov" |>> MOOV   
+            ) >>-- injector "moov" |>> MOOV
 
-    let video : VideoParser<_> = many (choice[  attempt ftyp; 
-                                                moov; 
-                                                mdat; 
+    let video : VideoParser<_> = many (choice[  attempt ftyp;
+                                                moov;
+                                                mdat;
                                                 free;]) .>> eof
-                        

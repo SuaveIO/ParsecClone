@@ -38,7 +38,7 @@ This will install the ParsecClone F# library.
 
 Included in the main `ParsecClone.Combinator` dll are:
 
-- The general operators are in `ParsecClone.CombinatorBase`
+- The general operators are in `ParsecClone.Operators`
 - The string handling in `ParsecClone.StringCombinator`
 - And the binary operators in `ParsecClone.BinaryCombinator`
 

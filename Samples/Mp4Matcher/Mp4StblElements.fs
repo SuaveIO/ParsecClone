@@ -1,13 +1,13 @@
 ﻿namespace Mp4Matcher
 
+open ParsecClone
 open ParsecClone.BinaryCombinator
-open ParsecClone.CombinatorBase
 open System
 
 [<AutoOpen>]
-module Mp4StblElements =   
-  
-    let stts : VideoParser<_> = 
+module Mp4StblElements =
+
+    let stts : VideoParser<_> =
         atom "stts" >>= fun id ->
         versionAndFlags     >>= fun vFlags ->
         bp.uint32           >>= fun numEntries ->
@@ -19,18 +19,18 @@ module Mp4StblElements =
             SampleTimes = samples
         } |>> STTS
 
-    let ctts : VideoParser<_> = 
+    let ctts : VideoParser<_> =
         atom "ctts"         >>= fun id ->
         skipRemaining id.Size 8  >>= fun _ ->
         freeOpt >>. preturn id  |>> CTTS
 
-    let stsd : VideoParser<_> = 
+    let stsd : VideoParser<_> =
         atom "stsd"    >>= fun id ->
         versionAndFlags     >>= fun vFlags ->
         bp.uint32           >>= fun numEntries ->
         freeOpt >>. sampleDescription  |>> STSD
-    
-    let stsz : VideoParser<_> = 
+
+    let stsz : VideoParser<_> =
         atom "stsz"    >>= fun id ->
         versionAndFlags     >>= fun vFlags ->
         bp.uint32           >>= fun sampleSize ->
@@ -44,7 +44,7 @@ module Mp4StblElements =
         } |>> STSZ
 
 
-    let stsc : VideoParser<_> = 
+    let stsc : VideoParser<_> =
         atom "stsc" >>= fun id ->
         versionAndFlags     >>= fun vFlags ->
         bp.uint32           >>= fun numEntries ->
@@ -56,7 +56,7 @@ module Mp4StblElements =
             SampleChunks = samples
         } |>> STSC
 
-    let stco : VideoParser<_> = 
+    let stco : VideoParser<_> =
         atom "stco"    >>= fun id ->
         versionAndFlags     >>= fun vFlags ->
         bp.uint32           >>= fun numEntries ->
@@ -69,7 +69,7 @@ module Mp4StblElements =
         } |>> STCO
 
 
-    let stss : VideoParser<_> = 
+    let stss : VideoParser<_> =
         atom "stss" >>= fun id ->
         versionAndFlags     >>= fun vFlags ->
         bp.uint32           >>= fun numEntries ->
@@ -80,4 +80,4 @@ module Mp4StblElements =
             NumberOfEntries = numEntries
             SyncSamples = syncSamples
         } |>> STSS
-       
+

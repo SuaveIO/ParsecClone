@@ -1,7 +1,7 @@
 ﻿namespace StringMatchers
 
+open ParsecClone
 open ParsecClone.StringCombinator
-open ParsecClone.CombinatorBase
 
 module CsvSample =
     type CsvParser<'Return> = Parser<'Return, string, string, unit>

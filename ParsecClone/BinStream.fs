@@ -2,7 +2,7 @@
 
 open System.IO
 open System.Collections.Generic
-open ParsecClone.CombinatorBase
+open ParsecClone
 
 type BinArgs = {
     // key = stream start position

@@ -2,7 +2,7 @@
 
 open System
 open System.Runtime.InteropServices
-open ParsecClone.CombinatorBase
+open ParsecClone
 open ParsecClone.BinaryCombinator
 
 [<AutoOpen>]
