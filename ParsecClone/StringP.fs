@@ -2,11 +2,10 @@
 
 open ParsecClone.CombinatorBase
 open System.Text.RegularExpressions
-open System
 
 [<AutoOpen>]
-module StringP = 
-    
+module StringP =
+
     type ParseState<'UserState> = IStreamP<string,string,'UserState>
 
     let foldStrings strings = preturn (String.concat "" strings)
@@ -18,33 +17,33 @@ module StringP =
     let private isEof (input:ParseState<'UserState>) target = not (input.hasMore())
 
     let private invertRegexMatch (input:ParseState<'UserState>) target = (input |> getStringStream).invertRegexMatch input target 1
-    
+
     let private startsWith (input:ParseState<'UserState>) target = (input |> getStringStream).startsWith input target
 
-    let private regexMatch (input:ParseState<'UserState>) target = (input |> getStringStream).regexMatch input target 
+    let private regexMatch (input:ParseState<'UserState>) target = (input |> getStringStream).regexMatch input target
 
     let regexStr pattern = matcher regexMatch pattern
 
     let matchStr str = matcher startsWith str
 
-    let invertRegex pattern = matcher invertRegexMatch pattern 
-        
+    let invertRegex pattern = matcher invertRegexMatch pattern
+
     let anyBut = invertRegex
 
     let char s = regexStr "[a-z]" s
 
-    let chars s = regexStr "[a-z]+" s   
+    let chars s = regexStr "[a-z]+" s
 
     let digit s = regexStr "[0-9]" s
 
     let digits s = regexStr "[0-9]+" s
-   
+
     let newline s = (regexStr "\r\n" <|> regexStr "\r" <|> regexStr "\n") s
 
     let whitespace s = regexStr "\s" s
 
     let whitespaces s = regexStr "\s+" s
-    
+
     let space s = regexStr " " s
 
     let spaces s = regexStr " +" s
@@ -57,13 +56,13 @@ module StringP =
 
     let isUpper = isMatch "[A-Z]"
 
-    let isLower = isMatch "[a-z]"  
+    let isLower = isMatch "[a-z]"
 
     let any s = regexStr "." s
 
     let isChar = isMatch "[A-z]"
 
-    let isSpace = function 
+    let isSpace = function
                     | " "
                     | "\t" -> true
                     | _ -> false
@@ -74,12 +73,12 @@ module StringP =
                         | None -> preturn "") s
 
     let isNewLine i = isMatch "\r\n" i || isMatch "\r" i || isMatch "\n" i
-  
-    let allWhiteSpace s = 
-        let isIgnoreSpace = function 
+
+    let allWhiteSpace s =
+        let isIgnoreSpace = function
                 | " "
-                | "\t" 
-                | "\n" 
+                | "\t"
+                | "\n"
                 | "\r"
                 | "\r\n" -> true
                 | _ -> false
@@ -88,8 +87,8 @@ module StringP =
                     | Some(i) -> preturn (List.reduce (+) i)
                     | None -> preturn "") s
 
-    
-    let pfloat s =   
+
+    let pfloat s =
         let matcher = regexStr @"-?[0-9]+(\.)?[0-9]*" >>= (fun x ->
                         match System.Double.TryParse x with
                         | true, x -> preturn x
@@ -97,7 +96,7 @@ module StringP =
 
         matcher s
 
-    let pint s =   
+    let pint s =
         let matcher = regexStr @"-?[0-9]+" >>= (fun x ->
                         match System.Int32.TryParse x with
                         | true, x -> preturn x
@@ -106,7 +105,7 @@ module StringP =
         matcher s
 
     let stringLiteral delim escapeString =
-        fun s -> 
+        fun s ->
             let unescape = function | c -> escapeString + c
 
             let notDelimMatched a = a <> delim
@@ -116,5 +115,5 @@ module StringP =
             let literal = (many (satisfy (notDelimMatched) (escaped <|> any))) >>= foldStrings
 
             literal s
-    
-    let quotedStringLiteral s = stringLiteral "\"" "\\" s 
+
+    let quotedStringLiteral s = stringLiteral "\"" "\\" s

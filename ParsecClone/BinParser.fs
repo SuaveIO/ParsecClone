@@ -131,4 +131,3 @@ module BinParsers =
     let defineStructParserLE<'T when 'T: unmanaged > = parseStruct<'T, unit> false
 
     let defineStructParserBE<'T when 'T: unmanaged > = parseStruct<'T, unit> true
-
