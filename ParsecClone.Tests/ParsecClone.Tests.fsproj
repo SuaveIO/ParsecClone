@@ -38,7 +38,7 @@
 
   <ItemGroup>
     <ProjectReference Include="../ParsecClone/ParsecClone.fsproj" />
-    <ProjectReference Include="../Samples/StringMatchSamples/StringMatchers.fsproj" />
+    <ProjectReference Include="../Samples/StringMatchers/StringMatchers.fsproj" />
     <ProjectReference Include="../Samples/Mp4Matcher/Mp4Matcher.fsproj" />
   </ItemGroup>
 

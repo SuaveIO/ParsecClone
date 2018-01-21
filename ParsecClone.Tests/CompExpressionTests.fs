@@ -5,7 +5,6 @@ open Expecto
 open ParsecClone.StringCombinator
 open ParsecClone.CombinatorBase
 
-[<Test>]
 let testExpression() =
     let state = makeStringStream "this is a test"
 
@@ -20,3 +19,6 @@ let testExpression() =
     let result = test state parser
 
     result |> Expect.equal "equal" "test"
+
+[<Tests>]
+let tests = testCase "expression" testExpression

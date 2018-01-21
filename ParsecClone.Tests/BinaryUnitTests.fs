@@ -31,10 +31,10 @@ let binTest1() =
 
     let result = test parserStream parser
 
-    result |> Expect.equal "Should be zero" 0
+    result |> Expect.equal "Should be zero" 0uy
 
-let byteListToArr arr =
-    arr |> Array.toSeq |> Seq.take 4 |> Seq.toArray |> Array.map byte
+let inline byteListToArr arr =
+  arr |> Seq.take 4 |> Seq.toArray |> Array.map byte
 
 let binTest2() =
     let bytes = [|0;1;2;3;4;5;6;7;8|] |> Array.map byte
@@ -47,7 +47,7 @@ let binTest2() =
 
     let result = test parserStream parser
 
-    result |> Expect.equal "equal" (bytes |> byteListToArr)
+    byteListToArr result |> Expect.equal "equal" bytes
 
 let binTest3() =
     let bytes = [|0;1;2;3;4;5;6;7;8|] |> Array.map byte
@@ -60,7 +60,7 @@ let binTest3() =
 
     let result = test parserStream parser
 
-    result |> Expect.equal "equal" [[|0;1;2;3|];[|4;5;6;7|]]
+    result |> Expect.equal "equal" [[|0uy;1uy;2uy;3uy|];[|4uy;5uy;6uy;7uy|]]
 
 let binTest4() =
     let p = new BinParser<_>(id)
@@ -125,7 +125,7 @@ let takeTillTest() =
 
     let result = test parserStream takenLower
 
-    result |> Expect.equal "equal" ([|0;1;2;3|] |> Array.map byte)
+    Array.ofList result |> Expect.equal "equal" [|0uy;1uy;2uy;3uy|]
 
 let takeTillTest2() =
     let bytes = [|0;1;2;3;4;5;6;7;8|] |> Array.map byte
@@ -159,7 +159,7 @@ let endianessTest() =
 
     let result = test parserStream uint16
 
-    result |> Expect.equal "equal" 4475
+    result |> Expect.equal "equal" 4475us
 
 
 let endianessTest2() =
@@ -169,7 +169,7 @@ let endianessTest2() =
 
     let result = test parserStream int16
 
-    result |> Expect.equal "equal" -3717
+    result |> Expect.equal "equal" -3717s
 
 let bitParserTest() =
     let bytes = [|0xF0;0x01|] |> Array.map byte
