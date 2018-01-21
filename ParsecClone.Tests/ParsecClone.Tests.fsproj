@@ -18,6 +18,7 @@
     <Compile Include="BinaryUnitTests.fs" />
     <Compile Include="CsvSampleTests.fs" />
     <Compile Include="Mp4ParserTests.fs" />
+    <Compile Include="Program.fs" />
     <None Include="NoFtyp.m4v">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

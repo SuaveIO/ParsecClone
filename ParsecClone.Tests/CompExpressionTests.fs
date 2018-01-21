@@ -1,12 +1,12 @@
-﻿module CompExpressionTests
+﻿module ParsecClone.Tests.CompExpressionTests
 
-open FsUnit
-open NUnit.Framework
+open Expecto.Flip
+open Expecto
 open ParsecClone.StringCombinator
 open ParsecClone.CombinatorBase
 
 [<Test>]
-let testExpression() = 
+let testExpression() =
     let state = makeStringStream "this is a test"
 
     let parser = parse {
@@ -19,4 +19,4 @@ let testExpression() =
 
     let result = test state parser
 
-    result |> should equal "test"
+    result |> Expect.equal "equal" "test"

@@ -1,7 +1,7 @@
-module ManyUnitTests
+module ParsecClone.Tests.ManyUnitTests
 
-open NUnit.Framework
-open FsUnit
+open Expecto
+open Expecto.Flip
 open System.IO
 open ParsecClone.BinaryCombinator
 open ParsecClone.CombinatorBase
@@ -18,8 +18,8 @@ let parser = parse {
 }
 
 [<Test>]
-let testMany () = 
+let testMany () =
   let bytes = [| 01uy; 02uy |]
   let s = new MemoryStream (bytes) |> makeBinStream
   let result = test s parser
-  result |> should equal (([]: byte list), [1uy])
+  result |> Expect.equal "equal" (([]: byte list), [1uy])

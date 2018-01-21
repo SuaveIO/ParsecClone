@@ -1,8 +1,8 @@
-﻿module CsvtringUnitTests 
+﻿module ParsecClone.Tests.CsvtringUnitTests
 
 open System
-open NUnit.Framework
-open FsUnit
+open Expecto
+open Expecto.Flip
 
 open ParsecClone.StringCombinator
 open ParsecClone.CombinatorBase
@@ -10,47 +10,47 @@ open StringMatchers.CsvSample
 
 
 [<Test>]
-let testEmptyWhiteSpace() = 
+let testEmptyWhiteSpace() =
     let csv = makeStringStream ""
 
     let result = test csv ws
 
-    result |> should equal ""
+    result |> Expect.equal "equal" ""
 
 [<Test>]
-let testWhiteSpace() = 
+let testWhiteSpace() =
     let csv = makeStringStream " "
 
     let result = test csv ws
 
-    result |> should equal " "
+    result |> Expect.equal "equal" " "
 
 [<Test>]
-let testElement() = 
+let testElement() =
     let csv = makeStringStream "some text"
 
     let result = test csv csvElement
 
-    result |> should equal "some text"
-    
+    result |> Expect.equal "equal" "some text"
+
 [<Test>]
-let testElements() = 
+let testElements() =
     let csv = makeStringStream "some text,"
 
     let result = test csv csvElement
 
-    result |> should equal ("some text")
+    result |> Expect.equal "equal" ("some text")
 
 [<Test>]
-let testTwoElement() = 
+let testTwoElement() =
     let csv = makeStringStream "some text, text two"
 
     let result = test csv elements
 
-    result |> should equal (["some text";"text two"] |> List.map Some)
+    result |> Expect.equal "equal" (["some text";"text two"] |> List.map Some)
 
 [<Test>]
-let testTwoLines() = 
+let testTwoLines() =
     let t = @"a, b
 c, d"
 
@@ -58,58 +58,58 @@ c, d"
 
     let result = test csv lines
 
-    result |> should equal [["a";"b"] |> List.map Some;
+    result |> Expect.equal "equal" [["a";"b"] |> List.map Some;
                             ["c";"d"] |> List.map Some]
 
 [<Test>]
-let testEscaped() = 
+let testEscaped() =
     let t = @"\,"
 
     let csv = makeStringStream t
 
     let result = test csv escapedChar
 
-    result |> should equal ","
+    result |> Expect.equal "equal" ","
 
 [<Test>]
-let testLiteral() = 
+let testLiteral() =
     let t = "\"foo\""
 
     let csv = makeStringStream t
 
     let result = test csv literal
 
-    result |> should equal "foo"
+    result |> Expect.equal "equal" "foo"
 
 [<Test>]
-let testLiteral2() = 
+let testLiteral2() =
     let t = "a\,b"
 
     let csv = makeStringStream t
 
     let result = test csv normalAndEscaped
 
-    result |> should equal "a,b"
+    result |> Expect.equal "equal" "a,b"
 
 [<Test>]
-let testUnEscaped1() = 
+let testUnEscaped1() =
     let t = "a,b"
 
     let csv = makeStringStream t
 
     let result = test csv normalAndEscaped
 
-    result |> should equal "a"
+    result |> Expect.equal "equal" "a"
 
 [<Test>]
-let testCsvWithQuotes1() = 
+let testCsvWithQuotes1() =
     let t = "\"cd,fg\""
 
     let csv = makeStringStream t
 
     let result = test csv lines
 
-    result |> should equal [["cd,fg"] |> List.map Some]
+    result |> Expect.equal "equal" [["cd,fg"] |> List.map Some]
 
 [<Test>]
 let testEmpties() =
@@ -119,10 +119,10 @@ let testEmpties() =
 
     let result = test csv lines
 
-    result |> should equal [[Some "";Some "";Some "";Some ""]]
+    result |> Expect.equal "equal" [[Some "";Some "";Some "";Some ""]]
 
 [<Test>]
-let testCsvWithQuotes2() = 
+let testCsvWithQuotes2() =
     let t = "a,\"b 1.\\\",\"cd,fg\"
 a,b,\\\", \"cd,fg\",,"
 
@@ -130,23 +130,23 @@ a,b,\\\", \"cd,fg\",,"
 
     let result = test csv lines |> List.toArray
 
-    result.[0] |> should equal (["a";"b 1.\\";"cd,fg"] |> List.map Some)
-    result.[1] |> should equal ([Some("a");Some("b");Some("\"");Some("cd,fg");Some "";Some ""])
+    result.[0] |> Expect.equal "equal" (["a";"b 1.\\";"cd,fg"] |> List.map Some)
+    result.[1] |> Expect.equal "equal" ([Some("a");Some("b");Some("\"");Some("cd,fg");Some "";Some ""])
 
 [<Test>]
-let testCsvWithOptionalElements() = 
+let testCsvWithOptionalElements() =
     let t = ",,"
 
     let csv = makeStringStream t
 
     let result = test csv lines |> List.toArray
 
-    result.[0] |> should equal ([Some ""; Some ""; Some ""])
+    result.[0] |> Expect.equal "equal" ([Some ""; Some ""; Some ""])
 
 
 
 [<Test>]
-let testAll() = 
+let testAll() =
     let t = @"This is some text! whoo ha, ""words"", This is some text! whoo ha, ""words"", This is some text! whoo ha, ""words"", This is some text! whoo ha, ""words"", This is some text! whoo ha, ""words""
 This is some text! whoo ha, ""words"", This is some text! whoo ha, ""words"", This is some text! whoo ha, ""words"", This is some text! whoo ha, ""words"", This is some text! whoo ha, ""words""
 This is some text! whoo ha, ""words"", This is some text! whoo ha, ""words"", This is some text! whoo ha, ""words"", This is some text! whoo ha, ""words"", This is some text! whoo ha, ""words""
@@ -163,36 +163,36 @@ This is some text! whoo ha, ""words"", This is some text! whoo ha, ""words"", Th
 
     let result = test csv lines
 
-    List.length result |> should equal 11
+    List.length result |> Expect.equal "equal" 11
 
 
 [<Test>]
-let testCsvWithEscapedNewlines() = 
+let testCsvWithEscapedNewlines() =
     let t = "a\\nb"
 
     let csv = makeStringStream t
 
     let result = test csv lines |> List.toArray
 
-    result.[0] |> should equal (["a\nb"] |> List.map Some)    
+    result.[0] |> Expect.equal "equal" (["a\nb"] |> List.map Some)
 
 [<Test>]
-let testCsvWithNewlinesInQuotes() = 
+let testCsvWithNewlinesInQuotes() =
     let t = @"""a
-    
+
 b"""
 
     let csv = makeStringStream t
 
-    let result = test csv lines 
+    let result = test csv lines
 
-    result |> should equal [[@"a
-    
-b"] |> List.map Some]  
+    result |> Expect.equal "equal" [[@"a
+
+b"] |> List.map Some]
 
 
 [<Test>]
-let testReadmeExample1 () = 
+let testReadmeExample1 () =
     let t = "foo\,,,bar,baz\\\"
 faisal rules!"
 
@@ -200,27 +200,26 @@ faisal rules!"
 
     let result = test csv lines |> List.toArray
 
-    result.[0] |> should equal ([Some("foo,"); Some ""; Some("bar"); Some("baz\"")])
+    result.[0] |> Expect.equal "equal" ([Some("foo,"); Some ""; Some("bar"); Some("baz\"")])
 
 [<Test>]
-let testDoubleQuotes () = 
+let testDoubleQuotes () =
     let t = "\"a\" b def \"foo\","
 
     let csv = makeStringStream t
 
     let result = test csv lines |> List.toArray
 
-    result |> should equal [[Some(@"a b def foo"); Some ""]]
+    result |> Expect.equal "equal" [[Some(@"a b def foo"); Some ""]]
 
 [<Test>]
 [<ExpectedException>]
-let testEofMissing () = 
+let testEofMissing () =
     let t = "\"foo,\",bar,baz"
 
     let csv = makeStringStream t
 
     let r = test csv (csvElement .>> eof)
 
-    r |> should equal true
+    r |> Expect.equal "equal" true
 
-    
