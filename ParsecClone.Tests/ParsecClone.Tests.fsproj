@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net461;netcoreapp2.0</TargetFrameworks>
+    <AssemblyName>ParsecClone.Tests</AssemblyName>
+    <OutputType>Exe</OutputType>
+    <UseStandardResourceNames>false</UseStandardResourceNames>
+    <Version>3.0.0</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+    <Compile Include="CompExpressionTests.fs" />
+    <Compile Include="UserStateTests.fs" />
+    <Compile Include="FooStringUnitTest.fs" />
+    <Compile Include="BinaryUnitTests.fs" />
+    <Compile Include="CsvSampleTests.fs" />
+    <Compile Include="Mp4ParserTests.fs" />
+    <None Include="NoFtyp.m4v">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="WithFtyp.m4v">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="ffmpegMade.m4v">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="sample_iPod.m4v">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="sample_mpeg4.mp4">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../ParsecClone/ParsecClone.fsproj" />
+    <ProjectReference Include="../Samples/StringMatchSamples/StringMatchers.fsproj" />
+    <ProjectReference Include="../Samples/Mp4Matcher/Mp4Matcher.fsproj" />
+  </ItemGroup>
+
+  <Import Project="..\..\..\.paket\Paket.Restore.targets" />
+</Project>
