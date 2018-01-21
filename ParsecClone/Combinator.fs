@@ -337,6 +337,6 @@ module Combinator =
     let parse = ParserCombinator()
 
     let test (input:State<_,_,'UserState>) (parser:Parser<_,_,_,'UserState>) =
-        match parser input with
-            | (Some(m), s) -> m
-            | (None, _) -> failwith "No matches"
+      match parser input with
+      | (Some(m), s) -> m
+      | (None, _) -> failwith "No matches"

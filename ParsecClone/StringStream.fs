@@ -5,10 +5,10 @@ open System
 open System.Text.RegularExpressions
 
 [<AutoOpen>]
-module StringStreamP = 
-    type StringStreamP<'UserState> (state:string, userState:'UserState) =  
-        let mutable userState = userState        
-           
+module StringStreamP =
+    type StringStreamP<'UserState> (state:string, userState:'UserState) =
+        let mutable userState = userState
+
         let currentState = state
 
         do
@@ -19,18 +19,18 @@ module StringStreamP =
             if String.IsNullOrEmpty input.state then None
             else
                 let m = Regex.Match(input.state, "^(" + pattern + ")", RegexOptions.Singleline)
-                if m.Success then 
+                if m.Success then
                     Some ([ for g in m.Groups -> g.Value ]
                                 |> List.filter (String.IsNullOrEmpty >> not)
-                                |> List.head) 
-                else 
+                                |> List.head)
+                else
                     None
-    
-        interface IStreamP<string, string, 'UserState> with
-            member x.state with get() = currentState    
 
-            member x.consume count = 
-                
+        interface IStreamP<string, string, 'UserState> with
+            member x.state with get() = currentState
+
+            member x.consume count =
+
                 if Combinator.enableDebug then
                     printfn "reading %d from current state: %s" count state
 
@@ -38,12 +38,12 @@ module StringStreamP =
                 let newState = state.Remove(0, count)
                 (Some(result), new StringStreamP<'UserState>(newState, userState) :> IStreamP<string, string, 'UserState>)
 
-            member x.skip count = 
+            member x.skip count =
                 let (r, s) = (x:>IStreamP<_,_,_>).consume count
 
                 (Some(true), s)
 
-            member x.backtrack () =                 
+            member x.backtrack () =
                 if Combinator.enableDebug then
                     printfn "backtracking"
 
@@ -61,23 +61,23 @@ module StringStreamP =
 
             member x.position () = int64 state.Length
 
-        member x.startsWith (inputStream:IStreamP<string, string, 'UserState>) target = 
+        member x.startsWith (inputStream:IStreamP<string, string, 'UserState>) target =
             if String.IsNullOrEmpty inputStream.state then None
-            else if inputStream.state.StartsWith target then 
+            else if inputStream.state.StartsWith target then
                 Some target.Length
             else None
 
-        member x.regexMatch (input:IStreamP<string, string, 'UserState>) target = 
+        member x.regexMatch (input:IStreamP<string, string, 'UserState>) target =
             if String.IsNullOrEmpty input.state then None
-            else 
-                match input with 
+            else
+                match input with
                     | RegexStr target result -> Some(result.Length)
                     | _ -> None
-  
-         member x.invertRegexMatch (input:IStreamP<string, string, 'UserState>) target takeAmount = 
+
+         member x.invertRegexMatch (input:IStreamP<string, string, 'UserState>) target takeAmount =
             if String.IsNullOrEmpty input.state then None
-            else 
-                match input with 
+            else
+                match input with
                     | RegexStr target result -> None
                     | _ -> Some(takeAmount)
 

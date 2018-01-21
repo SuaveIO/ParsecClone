@@ -1,4 +1,4 @@
-module ParsecClone.Tests
+module ParsecClone.Tests.Program
 
 open Expecto
 

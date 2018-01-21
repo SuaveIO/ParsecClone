@@ -1,220 +1,211 @@
 ﻿module ParsecClone.Tests.FooStringUnitTests
 
-open System
 open Expecto
 open Expecto.Flip
 open ParsecClone.StringCombinator
 open ParsecClone.CombinatorBase
 open StringMatchers.FooSample
 
-[<Test>]
 let shortCircuitOr () =
-    let target = makeStringStream "fab"
+  let target = makeStringStream "fab"
 
-    let x = choice[matchStr "f"; matchStr "a"; matchStr "b"]
+  let x = choice[matchStr "f"; matchStr "a"; matchStr "b"]
 
-    let band = test target x
+  let band = test target x
 
-    () |> Expect.equal "equal" ()
+  () |> Expect.equal "equal" ()
 
-[<Test>]
 let preturnTest () =
-    let target = makeStringStream "foofighters"
+  let target = makeStringStream "foofighters"
+  let _ = test target band
+  ()
 
-    let band = test target band
-
-    match band with
-        | FooFighter -> Assert.IsTrue true
-
-[<Test>]
 let manyTest () =
-    let manyFooStr = test (makeStringStream "foofoofoofoofob") manyFoo
+  let manyFooStr = test (makeStringStream "foofoofoofoofob") manyFoo
 
-    Assert.IsTrue (List.length manyFooStr = 4)
+  List.length manyFooStr
+    |> Expect.equal "Has 4 foos" 4
 
-[<Test>]
 let fooString () =
-    let target = makeStringStream "foofighters"
+  let target = makeStringStream "foofighters"
 
-    let fString = test target fooString
+  let fString = test target fooString
 
-    fString = "foo" |> Assert.IsTrue
+  fString
+    |> Expect.equal "Shold eq foo" "foo"
 
-[<Test>]
 let fightString () =
-    let target = makeStringStream "foofighters"
+  let target = makeStringStream "foofighters"
 
-    let fightString = test target fighterString
+  let fightString = test target fighterString
 
-    fightString = "fighter" |> Assert.IsTrue
+  fightString
+    |> Expect.equal "Should be a fighter" "fighter"
 
-[<Test>]
 let testTuples () =
-    let target = makeStringStream "foofighters"
+  let target = makeStringStream "foofighters"
 
-    let (foo, fighters) = test target fighterTuples
+  let (foo, fighters) = test target fighterTuples
 
-    foo = "foo" |> Assert.IsTrue
-    fighters = "fighter" |> Assert.IsTrue
+  fighters
+    |> Expect.equal "Should be a fighter" "fighter"
 
 
-[<Test>]
 let options () =
-    let target = makeStringStream "foofighters"
+  let target = makeStringStream "foofighters"
 
-    test target opts = "foo" |> Assert.IsTrue
+  test target opts
+    |> Expect.equal "Should be foo" "foo"
 
-    test target optsC = "foo" |> Assert.IsTrue
+  test target optsC
+    |> Expect.equal "Should be foo" "foo"
 
-[<Test>]
 let manyOptions () =
-    let target = makeStringStream "foofighters" |> toInterface
+  let target = makeStringStream "foofighters" |> toInterface
 
-    test target (many opts) = ["foo";"fighter"] |> Assert.IsTrue
-    test target (many optsC) = ["foo";"fighter"] |> Assert.IsTrue
+  test target (many opts)
+    |> Expect.equal "Is an array of foo and fighter" ["foo";"fighter"]
 
-[<Test>]
+  test target (many optsC)
+    |> Expect.equal "Is an array of foo and fighter" ["foo";"fighter"]
 let regex () =
-    let target = makeStringStream "foofighters"
+  let target = makeStringStream "foofighters"
 
-    test target fRegex = "foof" |> Assert.IsTrue
+  test target fRegex
+    |> Expect.equal "Parsed a foof" "foof"
 
-[<Test>]
 let regexes () =
-    let target = makeStringStream "      foofighters           foofighters"
+  let target = makeStringStream "      foofighters           foofighters"
 
-    let result = test target fooFightersWithSpaces
+  test target fooFightersWithSpaces
+    |> List.length
+    |> Expect.equal "Should be four results" 4
 
-    result |> List.length = 4 |> Assert.IsTrue
-
-[<Test>]
 let anyOfChars () =
-    let target = makeStringStream "      foofighters           foofighters" |> toInterface
+  let target = makeStringStream "      foofighters           foofighters" |> toInterface
 
-    let result = test target allFooCharacters |> List.fold (+) ""
+  let result = test target allFooCharacters |> List.fold (+) ""
 
-    result = target.state |> Assert.IsTrue
+  result
+    |> Expect.equal "Target state eq result" target.state
 
-[<Test>]
-let newLine () =
-    let fullNewline = makeStringStream "\r\n"  |> toInterface
-    let carriageReturn = makeStringStream "\r" |> toInterface
-    let newLine = makeStringStream "\n"  |> toInterface
-    let nl = @"
+let newline () =
+  let fullNewline = makeStringStream "\r\n"  |> toInterface
+  let carriageReturn = makeStringStream "\r" |> toInterface
+  let newLine = makeStringStream "\n"  |> toInterface
+  let nl = @"
 "
-    let newLine2 = makeStringStream(nl) |> toInterface
+  let newLine2 = makeStringStream nl |> toInterface
 
-    test fullNewline newline = fullNewline.state |> Assert.IsTrue
-    test carriageReturn newline = carriageReturn.state |> Assert.IsTrue
-    test newLine newline = newLine.state |> Assert.IsTrue
-    test newLine2 newline = newLine2.state |> Assert.IsTrue
+  test fullNewline newline
+    |> Expect.equal "Parses full newline" fullNewline.state
+  test carriageReturn newline
+    |> Expect.equal "Parses linefeed" carriageReturn.state
+  test newLine newline
+    |> Expect.equal "Parses newline (1)" newLine.state
+  test newLine2 newline
+    |> Expect.equal "Parses newlinew (2)" newLine2.state
 
-[<Test>]
 let attemptTest () =
-    let target = makeStringStream "foofighters"
+  let target = makeStringStream "foofighters"
 
-    match test target parseWithErrorAttempt with
-        | FooFighter -> Assert.IsTrue true
+  let _ = test target parseWithErrorAttempt
+  ()
 
-[<Test>]
 let manyTillTest () =
-    let target = makeStringStream "abc abc def abc"
+  let target = makeStringStream "abc abc def abc"
 
-    let abc = matchStr "abc" .>> ws
+  let abc = matchStr "abc" .>> ws
 
-    let def = matchStr "def"
+  let def = matchStr "def"
 
-    let line = (manyTill abc def .>> ws) .>>. abc .>> eof
+  let line = (manyTill abc def .>> ws) .>>. abc .>> eof
 
-    let result = test target line
+  let result = test target line
 
-    result |> Expect.equal "equal" (["abc";"abc"],"abc")
+  result |> Expect.equal "equal" (["abc";"abc"],"abc")
 
-[<Test>]
-[<ExpectedException>]
 let manyTillOneOrMore () =
-    let target = makeStringStream "x abc def abc"
+  let target = makeStringStream "x abc def abc"
 
-    let abc = matchStr "abc" .>> ws
+  let abc = matchStr "abc" .>> ws
 
-    let def = matchStr "def"
+  let def = matchStr "def"
 
-    let line = (manyTill1 abc def .>> ws) .>>. abc .>> eof
+  let line = (manyTill1 abc def .>> ws) .>>. abc .>> eof
 
-    let result = test target line
+  let result = test target line
 
-    result |> Expect.equal "equal" (["abc";"abc"],"abc")
+  result |> Expect.equal "equal" (["abc";"abc"],"abc")
 
-[<Test>]
 let lookaheadTest () =
-    let target = makeStringStream "abc abc def abc" |> toInterface
+  let target = makeStringStream "abc abc def abc" |> toInterface
 
-    let abc = lookahead (matchStr "abc" .>> ws) >>= fun r ->
-        if r = "abc" then preturn "found"
-        else preturn "not found"
+  let abc =
+    lookahead (matchStr "abc" .>> ws) >>= fun r ->
+    if r = "abc" then preturn "found"
+    else preturn "not found"
 
-    match abc target with
-        | Some(m), state ->
-            m |> Expect.equal "equal" "found"
-            state.state |> Expect.equal "equal" target.state
-        | None, state ->
-            false |> Expect.equal "equal" true
+  match abc target with
+  | Some(m), state ->
+    m
+      |> Expect.equal "equal" "found"
+    state.state
+      |> Expect.equal "equal" target.state
 
-[<Test>]
-[<ExpectedException>]
+  | None, _ ->
+    false
+      |> Expect.equal "equal" true
+
 let many1TestFail () =
-    let target = makeStringStream "abc abc def abc" |> toInterface
+  let target = makeStringStream "abc abc def abc" |> toInterface
 
-    let foo = matchStr "foo"
+  let foo = matchStr "foo"
 
-    let manyFoo = many1 foo
+  let manyFoo = many1 foo
 
-    test target manyFoo |> Expect.equal "equal" false
+  test target manyFoo |> ignore
 
-[<Test>]
 let many1Test () =
-    let target = makeStringStream "abc abc def abc" |> toInterface
+  let target = makeStringStream "abc abc def abc" |> toInterface
 
-    let abc = ws >>. matchStr "abc"
+  let abc = ws >>. matchStr "abc"
 
-    let manyAbc = many1 abc
+  let manyAbc = many1 abc
 
-    test target manyAbc |> Expect.equal "equal" ["abc";"abc"]
+  test target manyAbc |> Expect.equal "equal" ["abc";"abc"]
 
-[<Test>]
 let testForwardingRefP() =
-    let target = makeStringStream "{abc}" |> toInterface
+  let target = makeStringStream "{abc}" |> toInterface
 
-    let abc = matchStr "abc"
+  let abc = matchStr "abc"
 
-    let impl, fwd = createParserForwardedToRef()
+  let impl, fwd = createParserForwardedToRef()
 
-    fwd := between (matchStr "{") abc (matchStr "}")
+  fwd := between (matchStr "{") abc (matchStr "}")
 
-    let result = test target impl
+  let result = test target impl
 
-    result |> Expect.equal "equal" "abc"
+  result |> Expect.equal "equal" "abc"
 
-[<Test>]
 let testForwardingRefPRecursive() =
-    let target = makeStringStream "{a{a{a{a{a}}}}}"
+  let target = makeStringStream "{a{a{a{a{a}}}}}"
 
 
-    let impl, fwd = createParserForwardedToRef()
+  let impl, fwd = createParserForwardedToRef()
 
-    let a  = matchStr "a"
-    let lB = matchStr "{"
-    let rB = matchStr "}"
+  let a  = matchStr "a"
+  let lB = matchStr "{"
+  let rB = matchStr "}"
 
-    let brak = between lB (a .>> opt impl) rB
+  let brak = between lB (a .>> opt impl) rB
 
-    fwd := brak
+  fwd := brak
 
-    let result = test target (impl .>> eof)
+  let result = test target (impl .>> eof)
 
-    result |> Expect.equal "equal" "a"
+  result |> Expect.equal "equal" "a"
 
-[<Test>]
 let reprocessTest() =
     let target = makeStringStream "abc" |> toInterface
 
@@ -232,7 +223,6 @@ let reprocessTest() =
 
     result |> Expect.equal "equal" "abcfoo"
 
-[<Test>]
 let stringLiteralTest() =
     let source = "Ex\\\"loremIpsum\\\" foo \\\"second string\\\" "
 
@@ -242,7 +232,6 @@ let stringLiteralTest() =
 
     result |> Expect.equal "equal" source
 
-[<Test>]
 let stringLiteralExTest() =
 
     let source = "a\,b\\n\r\\t,notmatched" |> makeStringStream
@@ -256,7 +245,6 @@ let stringLiteralExTest() =
     result |> Expect.equal "equal" ["a\,b\\n\r\\t"; "notmatched"]
 
 
-[<Test>]
 let stringLiteralExTest2() =
 
     let source = "\t" |> makeStringStream
@@ -269,7 +257,6 @@ let stringLiteralExTest2() =
 
     result |> Expect.equal "equal" ["\t"]
 
-[<Test>]
 let testFloat() =
     let random = new System.Random()
 
@@ -281,10 +268,42 @@ let testFloat() =
         let intStream = randomInt.ToString() |> makeStringStream
 
         let r1 = test doubleStream pfloat
-        r1 |> should (equalWithin 0.000000000001) randomDouble
+        r1 |> Expect.floatClose "close/equal" Accuracy.veryHigh randomDouble
 
         let r2 = test intStream pfloat
         r2 |> Expect.equal "equal" (System.Convert.ToDouble randomInt)
 
         let r3 = test intStream pint
         r3 |> Expect.equal "equal" randomInt
+
+[<Tests>]
+let tests =
+  testList "foo string" [
+    testCase "short circuit or" shortCircuitOr
+    testCase "preturn" preturnTest
+    testCase "many" manyTest
+    testCase "foo string" fooString
+    testCase "fight" fightString
+    testCase "tuples" testTuples
+    testCase "options" options
+    testCase "many options" manyOptions
+    testCase "regex" regex
+    testCase "regexes" regexes
+    testCase "any of chars" anyOfChars
+    testCase "newline" newline
+    testCase "attempt" attemptTest
+    testCase "many till" manyTillTest
+    testCase "many till one or more" <| fun () ->
+      Expect.throws "Should throw something" manyTillOneOrMore
+    testCase "lookahead" lookaheadTest
+    testCase "many1 failure" <| fun () ->
+      Expect.throws "Should throw" many1TestFail
+    testCase "many1" many1Test
+    testCase "forwarding ref P" testForwardingRefP
+    testCase "forwarding ref P recursive" testForwardingRefPRecursive
+    testCase "reprocess" reprocessTest
+    testCase "string literal" stringLiteralTest
+    testCase "string literal ex (1)" stringLiteralExTest
+    testCase "string literal ex (2)" stringLiteralExTest2
+    testCase "float" testFloat
+  ]

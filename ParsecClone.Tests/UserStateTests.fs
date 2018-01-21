@@ -7,7 +7,6 @@ open ParsecClone.StringCombinator
 
 type userState = { Name: string }
 
-[<Test>]
 let testUserState() =
 
     let state = new StringStreamP<userState>("foobar", { Name = "start!" })
@@ -20,3 +19,6 @@ let testUserState() =
     let r = test state result
 
     r |> Expect.equal "equal" { Name = "foo" }
+
+[<Tests>]
+let tests = testCase "user state" testUserState

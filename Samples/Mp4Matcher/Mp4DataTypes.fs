@@ -6,25 +6,25 @@ open ParsecClone.CombinatorBase
 open ParsecClone.BinaryCombinator
 
 [<AutoOpen>]
-module Mp4DataTypes = 
+module Mp4DataTypes =
 
-    type MaybeBuilder () = 
-        member x.Bind (result:'a option, func) = 
+    type MaybeBuilder () =
+        member x.Bind (result:'a option, func) =
             if result.IsSome then func(result.Value)
             else None
 
         member x.Return value = Some(value)
-        
-        member x.Delay f = f()    
-        
-        member x.Zero() = None                   
+
+        member x.Delay f = f()
+
+        member x.Zero() = None
 
     let maybe = new MaybeBuilder()
 
     type VideoState = { IsAudio: bool; CurrentStatePosition: int64 }
 
     type VideoParser<'Return> = Parser<'Return, System.IO.Stream, byte[], VideoState>
-    
+
     /// <summary>
     /// Creates a network order binary parser
     /// </summary>
@@ -47,7 +47,7 @@ module Mp4DataTypes =
                         "stsz";
                         "stsc";
                         "stco";
-                        "stss";                        
+                        "stss";
                         "edts";
                         "uuid";
                         "ftyp";
@@ -78,9 +78,9 @@ module Mp4DataTypes =
         Flags : uint32;
     }
 
-    type Ftyp = { 
-        MajorBrand: string; 
-        MinorVersion: uint32; 
+    type Ftyp = {
+        MajorBrand: string;
+        MinorVersion: uint32;
         Brands: string list option
     }
 
@@ -115,39 +115,39 @@ module Mp4DataTypes =
     }
 
     /// <summary>
-    /// The order is reversed since the file is read network order.  The bytes will be 
+    /// The order is reversed since the file is read network order.  The bytes will be
     /// mapped into this structure backwards as well so everything will match up
     /// </summary>
-    type TimeToSampleEntry = 
+    type TimeToSampleEntry =
         struct
-            val SampleDuration: uint32 
-            val SampleCount: uint32;             
+            val SampleDuration: uint32
+            val SampleCount: uint32;
         end
 
-    type SampleSizeEntry = 
-        struct 
-            val SampleSize : uint32 
+    type SampleSizeEntry =
+        struct
+            val SampleSize : uint32
         end
-    
+
     /// <summary>
-    /// The order is reversed since the file is read network order.  The bytes will be 
+    /// The order is reversed since the file is read network order.  The bytes will be
     /// mapped into this structure backwards as well so everything will match up
     /// </summary>
-    type SampleToChunkEntry = 
-        struct                    
-            val SampleDescriptionID: uint32           
-            val SamplesPerChunk: uint32                     
+    type SampleToChunkEntry =
+        struct
+            val SampleDescriptionID: uint32
+            val SamplesPerChunk: uint32
             val FirstChunk: uint32
         end
 
-    type ChunkOffsetEntry = 
+    type ChunkOffsetEntry =
         struct
-            val ChunkOffset: uint32 
+            val ChunkOffset: uint32
         end
-    
-    type SyncSampleEntry = 
+
+    type SyncSampleEntry =
         struct
-            val SampleNumber: uint32 
+            val SampleNumber: uint32
         end
 
     type Stts = {
@@ -184,53 +184,53 @@ module Mp4DataTypes =
         NumberOfEntries: uint32
         SyncSamples: SyncSampleEntry []
     }
-    
+
     (* A tree for use with parsing *)
 
-    type StsdTypes = 
+    type StsdTypes =
         | STSD_AUDIO of unit
         | STSD_VIDEO of unit
-    type StblTypes = 
+    type StblTypes =
         | STTS of Stts
         | STSD of StsdTypes
         | STSZ of Stsz
         | STSC of Stsc
         | STCO of Stco
-        | STSS of Stss    
-        | CTTS of AtomBase 
+        | STSS of Stss
+        | CTTS of AtomBase
         | UNKNOWN of AtomBase
-    type DinfTypes = 
-        | DREF of AtomBase   
+    type DinfTypes =
+        | DREF of AtomBase
         | UNKNOWN of AtomBase
-    type MinfTypes = 
+    type MinfTypes =
         | VMHD of AtomBase
         | SMHD of AtomBase
         | DINF of DinfTypes
         | STBL of StblTypes list
         | UNKNOWN of AtomBase
-    type MdiaTypes = 
+    type MdiaTypes =
         | MDHD of AtomBase
         | HDLR of AtomBase
         | MINF of MinfTypes list
         | UNKNOWN of AtomBase
-    type TrakTypes = 
+    type TrakTypes =
         | TKHD of Tkhd
         | EDTS of AtomBase
-        | MDIA of MdiaTypes list    
+        | MDIA of MdiaTypes list
         | UNKNOWN of AtomBase
-    type MoovTypes = 
+    type MoovTypes =
         | MVHD of Mvhd
         | IODS of AtomBase
         | UDTA of AtomBase
         | TRAK of TrakTypes list
         | UNKNOWN of AtomBase
-    type Atom = 
-        | FTYP of Ftyp 
+    type Atom =
+        | FTYP of Ftyp
         | MOOV of MoovTypes list
         | MDAT of AtomBase
         | FREE of AtomBase
         | UNKNOWN of AtomBase
-    
+
 
     (* Records that represent the transformed tree *)
 
@@ -246,7 +246,7 @@ module Mp4DataTypes =
         Audio: AtomBase option
     }
     type Dref = {
-        Dref: AtomBase    
+        Dref: AtomBase
     }
     type Minf = {
         MediaTypeHeader: VSMhd option
@@ -266,18 +266,18 @@ module Mp4DataTypes =
     type Mov = {
         Mvd: Mvhd option
         Iods: AtomBase option
-        Traks: Trak list 
+        Traks: Trak list
     }
-    type Movie = {     
+    type Movie = {
         Mov: Mov option
     }
 
     (* Functions to transform the tree into records for easier querying *)
 
-    let stblListToRecord stbls = 
+    let stblListToRecord stbls =
         let seed = { Stts = None; Stsz = None; Stsc =  None; Stco = None; Stss = None }
         List.fold (fun acc i ->
-            match i with 
+            match i with
             | STTS(x) -> { acc with Stts = Some(x) }
             | STSZ(x) -> { acc with Stsz = Some(x) }
             | STSC(x) -> { acc with Stsc = Some(x) }
@@ -286,46 +286,53 @@ module Mp4DataTypes =
             | _ -> acc) seed stbls
 
 
-    let minfListToRecord minfs = 
+    let minfListToRecord minfs =
         let seed = { MediaTypeHeader = None; Dinf = None; Stbl = None }
         List.fold (fun acc i ->
-            match i with 
-                | VMHD(x) -> { acc with MediaTypeHeader = Some({ Video = Some(x); Audio = None }) }
-                | SMHD(x) -> { acc with MediaTypeHeader = Some({ Video = None;    Audio = Some(x) }) }
-                | DINF(DREF(x)) -> { acc with Dinf = Some({ Dref = x }) } 
-                | STBL(xs) -> { acc with Stbl = Some(stblListToRecord xs) }) seed minfs
-                    
-    let mdiaListToRecord mdias = 
+            match i with
+            | VMHD(x) -> { acc with MediaTypeHeader = Some({ Video = Some(x); Audio = None }) }
+            | SMHD(x) -> { acc with MediaTypeHeader = Some({ Video = None;    Audio = Some(x) }) }
+            | DINF(DREF(x)) -> { acc with Dinf = Some({ Dref = x }) }
+            | STBL(xs) -> { acc with Stbl = Some(stblListToRecord xs) }
+            | x -> failwithf "Unhandled %A" x)
+            seed minfs
+
+    let mdiaListToRecord mdias =
         let seed = { Mdhd = None; Hdlr = None; Minf = None }
         List.fold (fun acc i ->
-            match i with 
-                | MINF(xs) -> { acc with Minf = Some(minfListToRecord xs) }
-                | HDLR(x) -> { acc with Hdlr = Some(x) }
-                | MDHD(x) -> { acc with Mdhd = Some(x) }) seed mdias
+            match i with
+            | MINF(xs) -> { acc with Minf = Some(minfListToRecord xs) }
+            | HDLR(x) -> { acc with Hdlr = Some(x) }
+            | MDHD(x) -> { acc with Mdhd = Some(x) }
+            | x -> failwithf "Unhandled %A" x)
+            seed mdias
 
-    let trackListToRecord tracks = 
+    let trackListToRecord tracks =
         let seed = { Header = None; Edts = None; Mdia = None }
-        List.fold (fun acc i -> 
-            match i with 
-                | TKHD(x) -> { acc with Header = Some(x) }
-                | EDTS(x) -> { acc with Edts = Some(x) }
-                | MDIA(x) -> { acc with Mdia = Some(mdiaListToRecord x) }
-                | _ -> acc) seed tracks
+        List.fold (fun acc i ->
+            match i with
+            | TKHD(x) -> { acc with Header = Some(x) }
+            | EDTS(x) -> { acc with Edts = Some(x) }
+            | MDIA(x) -> { acc with Mdia = Some(mdiaListToRecord x) }
+            | _ -> acc)
+            seed tracks
 
-    let moovListToRecord moovs = 
+    let moovListToRecord moovs =
         let seed = { Mvd = None; Iods = None; Traks = [] }
         List.fold (fun acc i ->
-            match i with 
-                | MVHD(x) -> { acc with Mvd = Some(x) }
-                | IODS(x) -> { acc with Iods = Some(x) }
-                | TRAK(xs) -> { acc with Traks = (trackListToRecord xs)::acc.Traks }
-                | _ -> acc) seed moovs
+            match i with
+            | MVHD(x) -> { acc with Mvd = Some(x) }
+            | IODS(x) -> { acc with Iods = Some(x) }
+            | TRAK(xs) -> { acc with Traks = (trackListToRecord xs)::acc.Traks }
+            | _ -> acc)
+            seed moovs
 
-    let rootListToRecord roots = 
+    let rootListToRecord roots =
         let seed = { Mov = None }
         List.fold (fun acc i ->
-            match i with 
-                | MOOV(xs) -> { acc with Mov = Some(moovListToRecord xs) }
-                | _ -> acc) seed roots
-                                
+            match i with
+            | MOOV(xs) -> { acc with Mov = Some(moovListToRecord xs) }
+            | _ -> acc)
+            seed roots
+
 

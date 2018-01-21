@@ -10,8 +10,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="App.config" />
-    <None Include="packages.config" />
     <Compile Include="CompExpressionTests.fs" />
     <Compile Include="UserStateTests.fs" />
     <Compile Include="FooStringUnitTest.fs" />
@@ -40,6 +38,10 @@
     <ProjectReference Include="../ParsecClone/ParsecClone.fsproj" />
     <ProjectReference Include="../Samples/StringMatchers/StringMatchers.fsproj" />
     <ProjectReference Include="../Samples/Mp4Matcher/Mp4Matcher.fsproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FSharp.Core" Version="4.2.3" />
   </ItemGroup>
 
   <Import Project="..\..\..\.paket\Paket.Restore.targets" />
